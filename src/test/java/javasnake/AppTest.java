@@ -1,4 +1,4 @@
-package java-snake;
+package javasnake;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

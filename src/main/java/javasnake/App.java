@@ -1,4 +1,4 @@
-package java-snake;
+package javasnake;
 
 /**
  * Hello world!
