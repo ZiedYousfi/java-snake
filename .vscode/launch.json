@@ -3,10 +3,10 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Run App",
+      "name": "App",
       "request": "launch",
       "mainClass": "javasnake.App",
-      "projectName": "javasnake",
+      "projectName": "java-snake",
       "vmArgs": ["-XstartOnFirstThread", "-Djava.awt.headless=false"]
     }
   ]
