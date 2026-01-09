@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.zied</groupId>
-  <artifactId>java-snake</artifactId>
+  <artifactId>javasnake</artifactId>
   <version>0.1.0</version>
 
-  <name>java-snake</name>
+  <name>javasnake</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
