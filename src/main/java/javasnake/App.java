@@ -67,6 +67,12 @@ public class App {
         // Render the changes above
         SDL_RenderPresent(renderer);
 
+        var rect1 = new io.github.libsdl4j.api.rect.SDL_Rect();
+        rect1.x = 100;
+        rect1.y = 100;
+        rect1.w = 200;
+        rect1.h = 150;
+
         // Start an event loop and react to events
         SDL_Event evt = new SDL_Event();
         boolean shouldRun = true;
@@ -88,6 +94,26 @@ public class App {
                         break;
                 }
             }
+
+            SDL_RenderClear(renderer);
+            
+            SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 0, (byte) 255, (byte) 255);
+            SDL_RenderDrawLine(renderer, 0, 0, 1024, 768);
+            SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 255, (byte) 0, (byte) 255);
+            SDL_RenderDrawLine(renderer, 1024, 0, 0, 768);
+            SDL_SetRenderDrawColor(renderer, (byte) 255, (byte) 255, (byte) 0, (byte) 255);
+            SDL_RenderDrawRect(renderer, rect1);
+            SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 255, (byte) 255, (byte) 255);
+            SDL_RenderFillRect(renderer, rect1);
+            SDL_SetRenderDrawColor(renderer, (byte) 255, (byte) 0, (byte) 255, (byte) 255);
+
+            rect1.x += 1;
+            rect1.y += 1;
+            SDL_RenderDrawRect(renderer, rect1);
+            SDL_SetRenderDrawColor(renderer, (byte) 255, (byte) 0, (byte) 0, (byte) 255);
+            SDL_RenderFillRect(renderer, rect1);
+
+            SDL_RenderPresent(renderer);
         }
 
         SDL_Quit();
