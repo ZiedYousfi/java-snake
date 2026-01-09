@@ -20,15 +20,34 @@ import static io.github.libsdl4j.api.video.SdlVideoConst.SDL_WINDOWPOS_CENTERED;
 
 public class App {
 
+    static {
+        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            String libraryPath = System.getProperty("jna.library.path", "");
+            if (!libraryPath.contains("/opt/homebrew/lib")) {
+                if (!libraryPath.isEmpty()) {
+                    libraryPath += ":";
+                }
+                libraryPath += "/opt/homebrew/lib";
+                System.setProperty("jna.library.path", libraryPath);
+            }
+        }
+    }
+
     public static void main(String[] args) {
+        runApp();
+    }
+
+    private static void runApp() {
         // Initialize SDL
         int result = SDL_Init(SDL_INIT_EVERYTHING);
         if (result != 0) {
-            throw new IllegalStateException("Unable to initialize SDL library (Error code " + result + "): " + SDL_GetError());
+            throw new IllegalStateException(
+                    "Unable to initialize SDL library (Error code " + result + "): " + SDL_GetError());
         }
 
         // Create and init the window
-        SDL_Window window = SDL_CreateWindow("Demo SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        SDL_Window window = SDL_CreateWindow("Demo SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768,
+                SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if (window == null) {
             throw new IllegalStateException("Unable to create SDL window: " + SDL_GetError());
         }
@@ -42,10 +61,10 @@ public class App {
         // Set color of renderer to green
         SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 255, (byte) 0, (byte) 255);
 
-        // Clear the window and make it all red
+        // Clear the window and make it all green
         SDL_RenderClear(renderer);
 
-        // Render the changes above ( which up until now had just happened behind the scenes )
+        // Render the changes above
         SDL_RenderPresent(renderer);
 
         // Start an event loop and react to events
@@ -64,6 +83,7 @@ public class App {
                         break;
                     case SDL_WINDOWEVENT:
                         System.out.println("Window event " + evt.window.event);
+                        break;
                     default:
                         break;
                 }
