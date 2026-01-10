@@ -96,22 +96,32 @@ public class App {
             }
 
             SDL_RenderClear(renderer);
-            
+
+            // Draw color : blue
             SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 0, (byte) 255, (byte) 255);
+            // Draw a diagonal line from top-left to bottom-right
             SDL_RenderDrawLine(renderer, 0, 0, 1024, 768);
+
+            // Draw color : green
             SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 255, (byte) 0, (byte) 255);
+            // Draw a diagonal line from top-right to bottom-left
             SDL_RenderDrawLine(renderer, 1024, 0, 0, 768);
+
+            // Draw color : yellow
             SDL_SetRenderDrawColor(renderer, (byte) 255, (byte) 255, (byte) 0, (byte) 255);
+            // Draw rectangle
             SDL_RenderDrawRect(renderer, rect1);
+
+            // Draw color : cyan
             SDL_SetRenderDrawColor(renderer, (byte) 0, (byte) 255, (byte) 255, (byte) 255);
+            // Fill rectangle
             SDL_RenderFillRect(renderer, rect1);
+
+            // Draw color : magenta
             SDL_SetRenderDrawColor(renderer, (byte) 255, (byte) 0, (byte) 255, (byte) 255);
 
             rect1.x += 1;
             rect1.y += 1;
-            SDL_RenderDrawRect(renderer, rect1);
-            SDL_SetRenderDrawColor(renderer, (byte) 255, (byte) 0, (byte) 0, (byte) 255);
-            SDL_RenderFillRect(renderer, rect1);
 
             SDL_RenderPresent(renderer);
         }
