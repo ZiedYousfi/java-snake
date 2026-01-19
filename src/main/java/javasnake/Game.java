@@ -92,6 +92,8 @@ public class Game {
   public void callbackSdlEvent(SDL_Event sdlEvent) {
     if (sdlEvent.type == SDL_QUIT) {
       stop();
+    } else {
+      System.out.println("Unhandled SDL Event: " + sdlEvent.type);
     }
   }
 }
