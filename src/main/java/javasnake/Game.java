@@ -9,6 +9,8 @@ public class Game {
   private int score;
   private boolean isRunning = true;
   private GameGrid grid;
+  private final int TARGET_FPS = 60;
+  
 
   public Game() {
     this.renderer = SdlRenderer.getInstance();
@@ -28,8 +30,7 @@ public class Game {
 
   public void start() {
     long lastTime = System.nanoTime();
-    double targetFps = 60.0;
-    double nsPerFrame = 1_000_000_000.0 / targetFps;
+    double nsPerFrame = 1_000_000_000.0 / TARGET_FPS;
     double delta = 0;
 
     while (isRunning) {
