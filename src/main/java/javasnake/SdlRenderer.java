@@ -3,6 +3,9 @@ package javasnake;
 import io.github.libsdl4j.api.render.SDL_Renderer;
 import io.github.libsdl4j.api.video.SDL_Window;
 import io.github.libsdl4j.api.rect.SDL_Rect;
+import io.github.libsdl4j.api.event.SDL_Event;
+
+import java.util.function.Consumer;
 
 import static io.github.libsdl4j.api.Sdl.SDL_Init;
 import static io.github.libsdl4j.api.Sdl.SDL_Quit;
@@ -15,6 +18,7 @@ import static io.github.libsdl4j.api.video.SDL_WindowFlags.SDL_WINDOW_SHOWN;
 import static io.github.libsdl4j.api.video.SdlVideo.SDL_CreateWindow;
 import static io.github.libsdl4j.api.video.SdlVideo.SDL_DestroyWindow;
 import static io.github.libsdl4j.api.video.SdlVideoConst.SDL_WINDOWPOS_CENTERED;
+import static io.github.libsdl4j.api.event.SdlEvents.SDL_PollEvent;
 
 public class SdlRenderer {
   private static SdlRenderer instance;
@@ -65,6 +69,13 @@ public class SdlRenderer {
 
   public void setColor(Color color) {
     SDL_SetRenderDrawColor(renderer, (byte) color.r(), (byte) color.g(), (byte) color.b(), (byte) color.a());
+  }
+
+  public void handleEvents(Consumer<SDL_Event> callback) {
+    SDL_Event event = new SDL_Event();
+    while (SDL_PollEvent(event) != 0) {
+      callback.accept(event);
+    }
   }
 
   public void clear() {

@@ -1,5 +1,8 @@
 package javasnake;
 
+import io.github.libsdl4j.api.event.SDL_Event;
+import static io.github.libsdl4j.api.event.SDL_EventType.SDL_QUIT;
+
 public class Game {
   private SdlRenderer renderer;
   private int frameCount;
@@ -9,6 +12,12 @@ public class Game {
 
   public Game() {
     this.renderer = SdlRenderer.getInstance();
+
+    renderer.setColor(Color.WHITE);
+    renderer.fillRect(new Rect(0, 0, 640, 640));
+    renderer.clear();
+    renderer.present();
+
     this.frameCount = 0;
     this.score = 0;
     this.grid = new GameGrid(20, 20, 32);
@@ -18,10 +27,32 @@ public class Game {
   }
 
   public void start() {
+    long lastTime = System.nanoTime();
+    double targetFps = 60.0;
+    double nsPerFrame = 1_000_000_000.0 / targetFps;
+    double delta = 0;
+
     while (isRunning) {
-      frameCount++;
-      // Game loop and logic would go here
+      long now = System.nanoTime();
+      delta += (now - lastTime) / nsPerFrame;
+      lastTime = now;
+
+      renderer.handleEvents(this::callbackSdlEvent);
+
+      while (delta >= 1) {
+        frameCount++;
+        delta--;
+      }
+
+      this.render();
+
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
     }
+    stop();
   }
 
   public int getFrameCount() {
@@ -38,6 +69,7 @@ public class Game {
 
   public void stop() {
     isRunning = false;
+    renderer.quit();
   }
 
   public void render() {
@@ -55,5 +87,11 @@ public class Game {
       }
     }
     renderer.present();
+  }
+
+  public void callbackSdlEvent(SDL_Event sdlEvent) {
+    if (sdlEvent.type == SDL_QUIT) {
+      stop();
+    }
   }
 }
