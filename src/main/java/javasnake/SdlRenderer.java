@@ -29,9 +29,10 @@ public class SdlRenderer {
   private final SDL_Renderer renderer;
 
   static {
+    // Fallback for macOS if SDL2 is not in the classpath/bundled
     if (System.getProperty("os.name").toLowerCase().contains("mac")) {
       String libraryPath = System.getProperty("jna.library.path", "");
-      if (!libraryPath.contains("/opt/homebrew/lib")) {
+      if (!libraryPath.contains("/opt/homebrew/lib") && new java.io.File("/opt/homebrew/lib").exists()) {
         if (!libraryPath.isEmpty()) {
           libraryPath += ":";
         }
