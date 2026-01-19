@@ -40,23 +40,75 @@ public class Game {
 
   public void start() {
     long lastTime = System.nanoTime();
-    double nsPerFrame = 1_000_000_000.0 / TARGET_FPS;
-    double delta = 0;
 
     while (isRunning) {
       long now = System.nanoTime();
-      delta += (now - lastTime) / nsPerFrame;
+      double elapsed = (now - lastTime) / 1_000_000_000.0;
       lastTime = now;
 
       renderer.handleEvents(this::callbackSdlEvent);
-      timeSinceLastFrame += delta * (1.0 / TARGET_FPS);
-      delta = 0;
+
+      timeSinceLastFrame += elapsed;
       if (timeSinceLastFrame >= TIME_PER_FRAME) {
-        this.render();
+        update();
         timeSinceLastFrame = 0;
+      }
+
+      this.render();
+
+      try {
+        Thread.sleep(1000 / TARGET_FPS);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
       }
     }
     stop();
+  }
+
+  public void update() {
+    frameCount++;
+
+    // Spawn food every 50 frames
+    if (frameCount % 50 == 0) {
+      var food = Cell.getRandomFoodCell(grid.getRows(), grid.getCols());
+      grid.getCell(food.getRow(), food.getCol()).setType(Cell.CellType.FOOD);
+    }
+
+    if (player.stepUpdate() == false) {
+      System.out.println("Game Over! Final Score: " + score);
+      stop();
+      return;
+    }
+
+    Cell.Position headPos = player.getSnakeBodyPositions().get(0);
+    if (grid.getCell(headPos.row(), headPos.col()).getType() == Cell.CellType.FOOD) {
+      score += 10;
+      player.grow();
+      // Ensure the food is "consumed" on the grid
+      grid.getCell(headPos.row(), headPos.col()).setType(Cell.CellType.EMPTY);
+    }
+
+    syncGrid();
+  }
+
+  private void syncGrid() {
+    // Clear old snake positions from grid
+    for (int r = 0; r < grid.getRows(); r++) {
+      for (int c = 0; c < grid.getCols(); c++) {
+        if (grid.getCell(r, c).getType() == Cell.CellType.SNAKE) {
+          grid.getCell(r, c).setType(Cell.CellType.EMPTY);
+        }
+      }
+    }
+
+    // Set player cells on the grid
+    for (Cell.Position pos : player.getSnakeBodyPositions()) {
+      try {
+        grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
+      } catch (Exception e) {
+        System.err.println(e);
+      }
+    }
   }
 
   public int getFrameCount() {
@@ -79,40 +131,6 @@ public class Game {
   public void render() {
     renderer.clear();
 
-    var food = Cell.getRandomFoodCell(grid.getRows(), grid.getCols());
-
-    grid.getCell(food.getRow(), food.getCol()).setType(Cell.CellType.FOOD);
-
-    if (player.stepUpdate() == false) {
-      System.out.println("Game Over! Final Score: " + score);
-      stop();
-      return;
-    }
-
-    if (grid.getCell(player.getSnakeBodyPositions().get(0).row(),
-        player.getSnakeBodyPositions().get(0).col()).getType() == Cell.CellType.FOOD) {
-      score += 10;
-      player.grow();
-    }
-
-    // Clear old snake positions from grid
-    for (int r = 0; r < grid.getRows(); r++) {
-      for (int c = 0; c < grid.getCols(); c++) {
-        if (grid.getCell(r, c).getType() == Cell.CellType.SNAKE) {
-          grid.getCell(r, c).setType(Cell.CellType.EMPTY);
-        }
-      }
-    }
-
-    // Set player cells on the grid
-    for (Cell.Position pos : player.getSnakeBodyPositions()) {
-      try {
-        grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
-      } catch (Exception e) {
-        System.err.println(e);
-      }
-    }
-
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {
         Cell cell = grid.getCell(r, c);
@@ -134,21 +152,25 @@ public class Game {
       case SDL_QUIT -> stop();
       case SDL_KEYDOWN -> {
         int keycode = sdlEvent.key.keysym.sym;
+        boolean directionChanged = false;
         if (keycode == SDLK_UP) {
           player.setDirection(new Player.Direction(-1, 0)); // W or Up Arrow
+          directionChanged = true;
         } else if (keycode == SDLK_DOWN) {
           player.setDirection(new Player.Direction(1, 0)); // S or Down Arrow
+          directionChanged = true;
         } else if (keycode == SDLK_LEFT) {
           player.setDirection(new Player.Direction(0, -1)); // A or Left Arrow
+          directionChanged = true;
         } else if (keycode == SDLK_RIGHT) {
           player.setDirection(new Player.Direction(0, 1)); // D or Right Arrow
-        } else {
-          // Do nothing or handle other keys if needed
+          directionChanged = true;
         }
-        render();
-      }
-      default -> {
-        System.out.println("Unhandled SDL Event: " + sdlEvent.type);
+
+        if (directionChanged) {
+          update();
+          timeSinceLastFrame = 0;
+        }
       }
     }
   }
