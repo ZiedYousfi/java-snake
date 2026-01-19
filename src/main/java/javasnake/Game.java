@@ -1,7 +1,13 @@
 package javasnake;
 
 import io.github.libsdl4j.api.event.SDL_Event;
+
+import static io.github.libsdl4j.api.event.SDL_EventType.SDL_KEYDOWN;
 import static io.github.libsdl4j.api.event.SDL_EventType.SDL_QUIT;
+import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_DOWN;
+import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_UP;
+import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_LEFT;
+import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_RIGHT;
 
 public class Game {
   private SdlRenderer renderer;
@@ -25,7 +31,7 @@ public class Game {
 
     this.frameCount = 0;
     this.score = 0;
-    this.grid = new GameGrid(20, 20, 32);
+    this.grid = new GameGrid(100, 100, 32);
     this.player = new Player(new Cell.Position(10, 10), new Player.Direction(1, 0), grid.getRows(), grid.getCols());
     this.isRunning = true;
 
@@ -113,10 +119,26 @@ public class Game {
   }
 
   public void callbackSdlEvent(SDL_Event sdlEvent) {
-    if (sdlEvent.type == SDL_QUIT) {
-      stop();
-    } else {
-      System.out.println("Unhandled SDL Event: " + sdlEvent.type);
+    switch (sdlEvent.type) {
+      case SDL_QUIT -> stop();
+      case SDL_KEYDOWN -> {
+        int keycode = sdlEvent.key.keysym.sym;
+        if (keycode == SDLK_UP) {
+          player.setDirection(new Player.Direction(-1, 0)); // W or Up Arrow
+        } else if (keycode == SDLK_DOWN) {
+          player.setDirection(new Player.Direction(1, 0)); // S or Down Arrow
+        } else if (keycode == SDLK_LEFT) {
+          player.setDirection(new Player.Direction(0, -1)); // A or Left Arrow
+        } else if (keycode == SDLK_RIGHT) {
+          player.setDirection(new Player.Direction(0, 1)); // D or Right Arrow
+        } else {
+          // Do nothing or handle other keys if needed
+        }
+        render();
+      }
+      default -> {
+        System.out.println("Unhandled SDL Event: " + sdlEvent.type);
+      }
     }
   }
 }
