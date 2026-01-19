@@ -31,6 +31,11 @@ public class Player {
     return currentDirection;
   }
 
+  public void setBoundaries(int rowLimit, int colLimit) {
+    this.rowLimit = rowLimit;
+    this.colLimit = colLimit;
+  }
+
   public boolean grow() {
     Cell.Position currentHead = snakeBodyPositions.get(0);
     if (currentHead.row() + currentDirection.deltaRow < 0 || currentHead.row() + currentDirection.deltaRow >= rowLimit

@@ -17,8 +17,11 @@ import static io.github.libsdl4j.api.video.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
 import static io.github.libsdl4j.api.video.SDL_WindowFlags.SDL_WINDOW_SHOWN;
 import static io.github.libsdl4j.api.video.SdlVideo.SDL_CreateWindow;
 import static io.github.libsdl4j.api.video.SdlVideo.SDL_DestroyWindow;
+import static io.github.libsdl4j.api.video.SdlVideo.SDL_GetWindowSize;
 import static io.github.libsdl4j.api.video.SdlVideoConst.SDL_WINDOWPOS_CENTERED;
 import static io.github.libsdl4j.api.event.SdlEvents.SDL_PollEvent;
+
+import com.sun.jna.ptr.IntByReference;
 
 public class SdlRenderer {
   private static SdlRenderer instance;
@@ -84,6 +87,20 @@ public class SdlRenderer {
 
   public void present() {
     SDL_RenderPresent(renderer);
+  }
+
+  public int getWindowWidth() {
+    IntByReference w = new IntByReference();
+    IntByReference h = new IntByReference();
+    SDL_GetWindowSize(window, w, h);
+    return w.getValue();
+  }
+
+  public int getWindowHeight() {
+    IntByReference w = new IntByReference();
+    IntByReference h = new IntByReference();
+    SDL_GetWindowSize(window, w, h);
+    return h.getValue();
   }
 
   public void drawLine(Point p1, Point p2) {

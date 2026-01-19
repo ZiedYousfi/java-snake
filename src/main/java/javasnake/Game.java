@@ -4,6 +4,9 @@ import io.github.libsdl4j.api.event.SDL_Event;
 
 import static io.github.libsdl4j.api.event.SDL_EventType.SDL_KEYDOWN;
 import static io.github.libsdl4j.api.event.SDL_EventType.SDL_QUIT;
+import static io.github.libsdl4j.api.event.SDL_EventType.SDL_WINDOWEVENT;
+import static io.github.libsdl4j.api.video.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED;
+import static io.github.libsdl4j.api.video.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED;
 import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_DOWN;
 import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_UP;
 import static io.github.libsdl4j.api.keycode.SDL_Keycode.SDLK_LEFT;
@@ -32,7 +35,10 @@ public class Game {
 
     this.frameCount = 0;
     this.score = 0;
-    this.grid = new GameGrid(100, 100, 32);
+    int w = renderer.getWindowWidth();
+    int h = renderer.getWindowHeight();
+    int cellSize = 32;
+    this.grid = new GameGrid(h / cellSize, w / cellSize, cellSize);
     this.player = new Player(new Cell.Position(10, 10), new Player.Direction(1, 0), grid.getRows(), grid.getCols());
     this.isRunning = true;
 
@@ -152,6 +158,16 @@ public class Game {
   public void callbackSdlEvent(SDL_Event sdlEvent) {
     switch (sdlEvent.type) {
       case SDL_QUIT -> stop();
+      case SDL_WINDOWEVENT -> {
+        if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED
+            || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+          int newWidth = sdlEvent.window.data1;
+          int newHeight = sdlEvent.window.data2;
+          int cellSize = grid.getCellSize();
+          this.grid = new GameGrid(newHeight / cellSize, newWidth / cellSize, cellSize);
+          player.setBoundaries(grid.getRows(), grid.getCols());
+        }
+      }
       case SDL_KEYDOWN -> {
         int keycode = sdlEvent.key.keysym.sym;
         boolean directionChanged = false;
