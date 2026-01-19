@@ -76,7 +76,7 @@ public class Game {
   public void update() {
     frameCount++;
 
-    if (timeSinceLastFoodSpawn >= 0.833) {
+    if (timeSinceLastFoodSpawn >= 5.0) {
       var food = Cell.getRandomFoodCell(grid.getRows(), grid.getCols());
       grid.getCell(food.getRow(), food.getCol()).setType(Cell.CellType.FOOD);
       timeSinceLastFoodSpawn = 0;
