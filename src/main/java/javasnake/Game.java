@@ -9,8 +9,8 @@ public class Game {
   private int score;
   private boolean isRunning = true;
   private GameGrid grid;
+  private Player player;
   private final int TARGET_FPS = 60;
-  
 
   public Game() {
     this.renderer = SdlRenderer.getInstance();
@@ -23,6 +23,7 @@ public class Game {
     this.frameCount = 0;
     this.score = 0;
     this.grid = new GameGrid(20, 20, 32);
+    this.player = new Player(new Cell.Position(10, 10));
     this.isRunning = true;
 
     this.render();
@@ -75,6 +76,12 @@ public class Game {
 
   public void render() {
     renderer.clear();
+
+    // Set player cells on the grid
+    for (Cell.Position pos : player.getSnakeBodyPositions()) {
+      grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
+    }
+
     for (int r = 0; r < grid.getRows(); r++) {
       for (int c = 0; c < grid.getCols(); c++) {
         Cell cell = grid.getCell(r, c);
