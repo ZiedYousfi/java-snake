@@ -18,6 +18,7 @@ public class Game {
   private Player player;
   private final int TARGET_FPS = 60;
   private double timeSinceLastFrame = 0.0;
+  private double timeSinceLastFoodSpawn = 0.0;
   // Time per frame in seconds
   private final double TIME_PER_FRAME = 10.0 / TARGET_FPS;
 
@@ -49,6 +50,7 @@ public class Game {
       renderer.handleEvents(this::callbackSdlEvent);
 
       timeSinceLastFrame += elapsed;
+      timeSinceLastFoodSpawn += elapsed;
       if (timeSinceLastFrame >= TIME_PER_FRAME) {
         update();
         timeSinceLastFrame = 0;
@@ -68,10 +70,10 @@ public class Game {
   public void update() {
     frameCount++;
 
-    // Spawn food every 50 frames
-    if (frameCount % 50 == 0) {
+    if (timeSinceLastFoodSpawn >= 0.833) {
       var food = Cell.getRandomFoodCell(grid.getRows(), grid.getCols());
       grid.getCell(food.getRow(), food.getCol()).setType(Cell.CellType.FOOD);
+      timeSinceLastFoodSpawn = 0;
     }
 
     if (player.stepUpdate() == false) {
@@ -153,21 +155,23 @@ public class Game {
       case SDL_KEYDOWN -> {
         int keycode = sdlEvent.key.keysym.sym;
         boolean directionChanged = false;
+        var targetDirection = player.getDirection();
         if (keycode == SDLK_UP) {
-          player.setDirection(new Player.Direction(-1, 0)); // W or Up Arrow
+          targetDirection = new Player.Direction(-1, 0); // W or Up Arrow
           directionChanged = true;
         } else if (keycode == SDLK_DOWN) {
-          player.setDirection(new Player.Direction(1, 0)); // S or Down Arrow
+          targetDirection = new Player.Direction(1, 0); // S or Down Arrow
           directionChanged = true;
         } else if (keycode == SDLK_LEFT) {
-          player.setDirection(new Player.Direction(0, -1)); // A or Left Arrow
+          targetDirection = new Player.Direction(0, -1); // A or Left Arrow
           directionChanged = true;
         } else if (keycode == SDLK_RIGHT) {
-          player.setDirection(new Player.Direction(0, 1)); // D or Right Arrow
+          targetDirection = new Player.Direction(0, 1); // D or Right Arrow
           directionChanged = true;
         }
 
         if (directionChanged) {
+          player.setDirection(targetDirection); // W or Up Arrow
           update();
           timeSinceLastFrame = 0;
         }
