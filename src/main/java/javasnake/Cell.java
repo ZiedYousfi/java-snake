@@ -15,6 +15,10 @@ public class Cell {
     this.type = type;
   }
 
+  public static Cell getRandomFoodCell(int maxRows, int maxCols) {
+    return new Cell((int) (Math.random() * maxRows), (int) (Math.random() * maxCols), CellType.FOOD);
+  }
+
   public int getRow() {
     return position.row();
   }

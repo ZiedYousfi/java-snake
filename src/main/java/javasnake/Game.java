@@ -79,10 +79,20 @@ public class Game {
   public void render() {
     renderer.clear();
 
+    var food = Cell.getRandomFoodCell(grid.getRows(), grid.getCols());
+
+    grid.getCell(food.getRow(), food.getCol()).setType(Cell.CellType.FOOD);
+
     if (player.stepUpdate() == false) {
       System.out.println("Game Over! Final Score: " + score);
       stop();
       return;
+    }
+
+    if (grid.getCell(player.getSnakeBodyPositions().get(0).row(),
+        player.getSnakeBodyPositions().get(0).col()).getType() == Cell.CellType.FOOD) {
+      score += 10;
+      player.grow();
     }
 
     // Clear old snake positions from grid
@@ -97,10 +107,10 @@ public class Game {
     // Set player cells on the grid
     for (Cell.Position pos : player.getSnakeBodyPositions()) {
       try {
-      grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
-    } catch (Exception e) {
-      System.err.println(e);
-    }
+        grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
+      } catch (Exception e) {
+        System.err.println(e);
+      }
     }
 
     for (int r = 0; r < grid.getRows(); r++) {
@@ -111,7 +121,8 @@ public class Game {
           case SNAKE -> renderer.setColor(Color.GREEN);
           case FOOD -> renderer.setColor(Color.RED);
         }
-        Rect cellRect = new Rect(c * grid.getCellSize(), r * grid.getCellSize(), grid.getCellSize(), grid.getCellSize());
+        Rect cellRect = new Rect(c * grid.getCellSize(), r * grid.getCellSize(), grid.getCellSize(),
+            grid.getCellSize());
         renderer.fillRect(cellRect);
       }
     }
