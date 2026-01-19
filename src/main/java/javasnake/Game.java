@@ -77,6 +77,8 @@ public class Game {
   public void render() {
     renderer.clear();
 
+    player.stepUpdate();
+
     // Set player cells on the grid
     for (Cell.Position pos : player.getSnakeBodyPositions()) {
       grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
