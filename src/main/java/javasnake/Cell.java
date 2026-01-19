@@ -1,8 +1,7 @@
 package javasnake;
 
 public class Cell {
-  private int row;
-  private int col;
+  private final Position position;
   private CellType type;
 
   public enum CellType {
@@ -12,17 +11,16 @@ public class Cell {
   }
 
   public Cell(int row, int col, CellType type) {
-    this.row = row;
-    this.col = col;
+    this.position = new Position(row, col);
     this.type = type;
   }
 
   public int getRow() {
-    return row;
+    return position.row();
   }
 
   public int getCol() {
-    return col;
+    return position.col();
   }
 
   public CellType getType() {
@@ -31,5 +29,8 @@ public class Cell {
 
   public void setType(CellType type) {
     this.type = type;
+  }
+
+  public record Position(int row, int col) {
   }
 }
