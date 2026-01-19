@@ -81,7 +81,11 @@ public class Game {
 
     // Set player cells on the grid
     for (Cell.Position pos : player.getSnakeBodyPositions()) {
+      try {
       grid.getCell(pos.row(), pos.col()).setType(Cell.CellType.SNAKE);
+    } catch (Exception e) {
+      System.err.println(e);
+    }
     }
 
     for (int r = 0; r < grid.getRows(); r++) {

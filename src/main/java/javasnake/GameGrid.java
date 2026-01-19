@@ -35,6 +35,6 @@ public class GameGrid {
     if (row >= 0 && row < rows && col >= 0 && col < cols) {
       return grid[row][col];
     }
-    return null;
+    throw new IndexOutOfBoundsException("Cell position out of bounds: (" + row + ", " + col + ")");
   }
 }
