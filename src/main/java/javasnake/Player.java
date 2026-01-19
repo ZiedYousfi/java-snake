@@ -8,34 +8,60 @@ public class Player {
   // positions (from neck to tail)
   private List<Cell.Position> snakeBodyPositions;
   private Direction currentDirection;
+  private int rowLimit;
+  private int colLimit;
 
-  public Player(Cell.Position initialPosition) {
+  public Player(Cell.Position initialPosition, Direction initialDirection, int rowLimit, int colLimit) {
     this.snakeBodyPositions = new LinkedList<>();
     this.snakeBodyPositions.add(initialPosition);
-    this.currentDirection = new Direction(1, 0);
+    this.currentDirection = initialDirection;
+    this.rowLimit = rowLimit;
+    this.colLimit = colLimit;
   }
 
   public List<Cell.Position> getSnakeBodyPositions() {
     return snakeBodyPositions;
   }
 
-  public void grow() {
-    Cell.Position currentHead = snakeBodyPositions.get(0);
-    Cell.Position newHead = new Cell.Position(
-        currentHead.row() + currentDirection.deltaX,
-        currentHead.col() + currentDirection.deltaY);
-    snakeBodyPositions.add(0, newHead); // Add new head
+  public void setDirection(Direction direction) {
+    this.currentDirection = direction;
   }
 
-  public void stepUpdate() {
+  public Direction getDirection() {
+    return currentDirection;
+  }
+
+  public boolean grow() {
     Cell.Position currentHead = snakeBodyPositions.get(0);
+    if (currentHead.row() + currentDirection.deltaRow < 0 || currentHead.row() + currentDirection.deltaRow >= rowLimit
+        ||
+        currentHead.col() + currentDirection.deltaCol < 0
+        || currentHead.col() + currentDirection.deltaCol >= colLimit) {
+      return false; // Out of bounds
+    }
     Cell.Position newHead = new Cell.Position(
-        currentHead.row() + currentDirection.deltaX,
-        currentHead.col() + currentDirection.deltaY);
+        currentHead.row() + currentDirection.deltaRow,
+        currentHead.col() + currentDirection.deltaCol);
+    snakeBodyPositions.add(0, newHead); // Add new head
+    return true;
+  }
+
+  public boolean stepUpdate() {
+    Cell.Position currentHead = snakeBodyPositions.get(0);
+    if (currentHead.row() + currentDirection.deltaRow < 0 || currentHead.row() + currentDirection.deltaRow >= rowLimit
+        ||
+        currentHead.col() + currentDirection.deltaCol < 0
+        || currentHead.col() + currentDirection.deltaCol >= colLimit) {
+      return false; // Out of bounds
+    }
+    Cell.Position newHead = new Cell.Position(
+        currentHead.row() + currentDirection.deltaRow,
+        currentHead.col() + currentDirection.deltaCol);
     snakeBodyPositions.add(0, newHead); // Add new head
     snakeBodyPositions.remove(snakeBodyPositions.size() - 1); // Remove tail
+    return true;
   }
 
-  public record Direction(int deltaX, int deltaY) {
+  public record Direction(int deltaRow, int deltaCol) {
   }
 }

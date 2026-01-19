@@ -11,6 +11,9 @@ public class Game {
   private GameGrid grid;
   private Player player;
   private final int TARGET_FPS = 60;
+  private double timeSinceLastFrame = 0.0;
+  // Time per frame in seconds
+  private final double TIME_PER_FRAME = 10.0 / TARGET_FPS;
 
   public Game() {
     this.renderer = SdlRenderer.getInstance();
@@ -23,7 +26,7 @@ public class Game {
     this.frameCount = 0;
     this.score = 0;
     this.grid = new GameGrid(20, 20, 32);
-    this.player = new Player(new Cell.Position(10, 10));
+    this.player = new Player(new Cell.Position(10, 10), new Player.Direction(1, 0), grid.getRows(), grid.getCols());
     this.isRunning = true;
 
     this.render();
@@ -40,18 +43,11 @@ public class Game {
       lastTime = now;
 
       renderer.handleEvents(this::callbackSdlEvent);
-
-      while (delta >= 1) {
-        frameCount++;
-        delta--;
-      }
-
-      this.render();
-
-      try {
-        Thread.sleep(1);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
+      timeSinceLastFrame += delta * (1.0 / TARGET_FPS);
+      delta = 0;
+      if (timeSinceLastFrame >= TIME_PER_FRAME) {
+        this.render();
+        timeSinceLastFrame = 0;
       }
     }
     stop();
@@ -77,7 +73,20 @@ public class Game {
   public void render() {
     renderer.clear();
 
-    player.stepUpdate();
+    if (player.stepUpdate() == false) {
+      System.out.println("Game Over! Final Score: " + score);
+      stop();
+      return;
+    }
+
+    // Clear old snake positions from grid
+    for (int r = 0; r < grid.getRows(); r++) {
+      for (int c = 0; c < grid.getCols(); c++) {
+        if (grid.getCell(r, c).getType() == Cell.CellType.SNAKE) {
+          grid.getCell(r, c).setType(Cell.CellType.EMPTY);
+        }
+      }
+    }
 
     // Set player cells on the grid
     for (Cell.Position pos : player.getSnakeBodyPositions()) {
